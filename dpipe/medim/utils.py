@@ -30,6 +30,9 @@ def load_image(path):
     elif path.endswith('.nii') or path.endswith('.nii.gz'):
         import nibabel as nib
         return nib.load(path).get_data()
+    elif path.endswith('.hdr') or path.endswith('.img'):
+        import nibabel as nib
+        return nib.load(path).get_data()
     else:
         raise ValueError(f"Couldn't read scan from path: {path}.\n"
                          "Unknown data extension.")
