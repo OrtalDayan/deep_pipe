@@ -11,7 +11,7 @@ class Oasis(FromCSVInt):
             metadata_rpath=metadata_rpath,
             modalities=['S'],
             target='T',
-            segm2msegm_matrix=np.array([[1], [1], [1], [1]], dtype=bool)
+            segm2msegm_matrix=np.array(np.diag([1, 1, 1, 1]), dtype=bool)
         )
 
     def load_segm(self, patient_id):
