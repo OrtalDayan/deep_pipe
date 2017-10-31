@@ -22,6 +22,10 @@ class Oasis(FromCSVInt):
 
     def load_mscan(self, patient_id):
         mscan = super().load_mscan(patient_id)
-        for scan in mscan:
-            scan.resize(scan.shape[:-1])
-        return mscan
+        assert(len(mscan) == 1)
+        scan = mscan[0]
+        scan.resize(scan.shape[:-1])
+        # Though resizing happens in place, for some reason resizing mscan[0], it's shape claims that it is unchanged.
+        # That's why I'm creating a scan variable and returning a new ndarray.
+        # returning new array.
+        return np.asarray([scan])
