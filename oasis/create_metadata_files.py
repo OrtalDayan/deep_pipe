@@ -2,6 +2,7 @@ import os
 import fnmatch
 import nibabel as nib
 import pandas as pd
+import argparse
 
 
 class PathHelper(object):
@@ -69,6 +70,9 @@ def create_metadata_csv(parent_dir_path, data_dir_name="data"):
 
 
 if __name__ == '__main__':
-    parent_dir = "/Users/gleb/Desktop/oasis"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('data_path', type=str, help='path to a dir with "data" folder')
+
+    parent_dir = parser.parse_args().data_path
     metadata = create_metadata_csv(parent_dir)
     metadata.to_csv(os.path.join(parent_dir, 'metadata.csv'), index_label='id')
