@@ -54,14 +54,13 @@ def process_disc_dir(disc, path_helper, records) -> None:
             raise RuntimeError
 
 
-def create_metadata_csv(parent_dir_path, data_dir_name="data"):
+def create_metadata_csv(parent_dir_path, first_disc, disc_num, data_dir_name="data"):
     records = {}
     path_helper = PathHelper(parent_dir_path, data_dir_name)
-    for disc in os.listdir(path_helper.data_path()):
-        if disc == ".DS_Store":
-            continue
-        if not fnmatch.fnmatch(disc, "disc*"):
-            raise RuntimeError
+
+    for disc_num in range(first_disc, first_disc + disc_num):
+        disc = "disc{}".format(disc_num)
+        print("processing {}".format(disc))
         process_disc_dir(disc, path_helper, records)
 
     metadata = pd.DataFrame.from_dict(records, 'index')
@@ -72,7 +71,14 @@ def create_metadata_csv(parent_dir_path, data_dir_name="data"):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('data_path', type=str, help='path to a dir with "data" folder')
+    parser.add_argument('--first_disc', type=int, default=1)
+    parser.add_argument('--disc_num', type=int, default=1)
 
-    parent_dir = parser.parse_args().data_path
-    metadata = create_metadata_csv(parent_dir)
+    args = parser.parse_args()
+    parent_dir = args.data_path
+    first_disc = args.first_disc
+    disc_num = args.disc_num
+
+    assert(1 <= first_disc <= 12 and 1 <= disc_num and first_disc + disc_num - 1 <= 12)
+    metadata = create_metadata_csv(parent_dir, first_disc, disc_num)
     metadata.to_csv(os.path.join(parent_dir, 'metadata.csv'), index_label='id')
