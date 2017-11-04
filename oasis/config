@@ -1,9 +1,9 @@
 @extends(
-    "assets/core/core.config",
-    "assets/batch_iter/3d_patch.config",
-    "assets/model/deepmedic_els.config",
-    "assets/training/deepmedic_brats.config",
-    "assets/problem/segm.config",
+    "../config_examples/assets/core/core.config",
+    "../config_examples/assets/batch_iter/3d_patch.config",
+    "../config_examples/assets/model/deepmedic_els.config",
+    "../config_examples/assets/training/deepmedic_brats.config",
+    "../config_examples/assets/problem/segm.config",
 )
 
 data_path = "/nmnt/x04-hdd/oasis_brain/"
