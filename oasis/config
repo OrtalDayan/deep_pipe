@@ -1,206 +1,27 @@
+@extends(
+    "assets/core/core.config",
+    "assets/batch_iter/3d_patch.config",
+    "assets/model/deepmedic_els.config",
+    "assets/training/deepmedic_brats.config",
+    "assets/problem/segm.config",
+)
+
 data_path = "/nmnt/x04-hdd/oasis_brain/"
 
 n_epochs = 2
 
 batch_size = 2
 
-console = io:console(
-)
-
-train_ids = io:json(
-    path = console.train_ids_path
-)
-
-val_ids = io:json(
-    path = console.val_ids_path
-)
-
-ids = io:json(
-    path = console.ids_path
-)
-
-load_x = dataset.load_mscan
-
-n_chans_in = dataset.n_chans_mscan
-
-save_model_path = console.save_model_path
-
-restore_model_path = console.restore_model_path
-
-build_experiment = experiment:flat(
-    makefile = makefile
-    config_path = console.config_path
-    experiment_path = console.experiment_path
-    split = split
-)
-
-train_model = command:train_model(
-    train = train
-    model = model
-    save_model_path = save_model_path
-)
-
-predict = command:predict(
-    ids = ids
-    output_path = console.output_path
-    load_x = load_x
-    frozen_model = frozen_model
-    batch_predict = batch_predict
-)
-
-compute_dices = command:compute_dices(
-    load_msegm = dataset.load_msegm
-    predictions_path = console.predictions_path
-    dices_path = console.dices_path
-)
-
-dataset = dataset_wrapper:cached(
-    dataset = dataset_wrapper:normalized(
+dataset = dataset_wrapper:cached
+    dataset = dataset_wrapper:normalized
         mean = true
         std = true
-        dataset = dataset:oasis(
+        dataset = dataset:oasis
             data_path = data_path
-        )
-    )
-)
 
-split = split:cv_111(
+split = split:cv_111
     n_splits = 5
     val_size = 5
     dataset = dataset
-)
-
-model_core = model_core:deepmedic_els(
-    with_dropout = false
-    downsampling_type = "sampling"
-    n_chans_in = n_chans_in
-    n_chans_out = n_chans_out
-)
-
-model = model:model(
-    model_core = model_core
-    logits2pred = logits2pred
-    logits2loss = logits2loss
-    optimize = optimize:tf_optimize(
-        @lazy
-        tf_optimizer_name = "MomentumOptimizer"
-        use_nesterov = true
-        momentum = 0.6
-    )
-)
-
-frozen_model = model:frozen_model(
-    model_core = model_core
-    logits2pred = logits2pred
-    restore_model_path = restore_model_path
-)
-
-batch_predict = batch_predict:patch_3d_fixed(
-    x_spatial_patch_sizes = [
-        [
-            106
-            106
-            106
-        ]
-        [
-            138
-            138
-            138
-        ]
-    ]
-    y_spatial_patch_size = [
-        90
-        90
-        90
-    ]
-    padding_mode = "min"
-)
-
-makefile = "train_msegm_threshold_eval"
-
-experiment = experiment:flat(
-    makefile = "train_msegm_threshold_eval"
-    config_path = console.config_path
-    experiment_path = console.experiment_path
-    split = split
-)
-
-load_y = dataset.load_msegm
-
-n_chans_out = dataset.n_chans_msegm
-
-logits2pred = logits2pred:sigmoid(
-    @lazy
-)
-
-logits2loss = logits2loss:sigmoid_cross_entropy(
-    @lazy
-)
-
-thresholds_path = console.thresholds_path
-
-find_thresholds = command:find_dice_threshold(
-    load_msegm = dataset.load_msegm
-    ids = ids
-    predictions_path = console.predictions_path
-    thresholds_path = thresholds_path
-)
-
-binarize = command:transform(
-    input_path = console.input_path
-    output_path = console.output_path
-    transform_fn = transform:binarize(
-        @lazy
-        thresholds = io:json(
-            path = thresholds_path
-        )
-    )
-)
 
 lr_dec_mul = 0.5
-
-train = train:train_msegm(
-    @lazy
-    n_epochs = n_epochs
-    lr_init = 0.1
-    lr_dec_mul = lr_dec_mul
-    patience = 5
-    rtol = 0.03
-    atol = 0.01
-    model = model
-    val_ids = val_ids
-    dataset = dataset
-    log_path = console.log_path
-    batch_predict = batch_predict
-    train_batch_iter_factory = batch_iter_factory
-)
-
-batch_iter_factory = batch_iter_factory:inf(
-    n_iters_per_batch = 100
-    get_batch_iter = batch_iter:patch_3d_strat(
-        @lazy
-        batch_size = 64
-        x_patch_sizes = [
-            [
-                25
-                25
-                25
-            ]
-            [
-                57
-                57
-                57
-            ]
-        ]
-        y_patch_size = [
-            9
-            9
-            9
-        ]
-        nonzero_fraction = 0.5
-        buffer_size = 10
-        ids = train_ids
-        load_x = load_x
-        load_y = load_y
-    )
-)
