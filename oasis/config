@@ -8,9 +8,9 @@
 
 data_path = "/nmnt/x04-hdd/oasis_brain/"
 
-n_epochs = 2
+n_epochs = 10
 
-batch_size = 2
+batch_size = 15
 
 dataset = dataset_wrapper:cached
     dataset = dataset_wrapper:normalized
