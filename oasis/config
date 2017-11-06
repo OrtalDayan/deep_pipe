@@ -6,7 +6,6 @@
     "../config_examples/assets/problem/segm.config",
 )
 
-restore_model_path = "../../oasisnumber/experiment_0/model"
 
 n_epochs = 10
 
@@ -38,6 +37,7 @@ load_x = dataset.load_mscan
 n_chans_in = dataset.n_chans_mscan
 
 save_model_path = console.save_model_path
+restore_model_path = console.restore_model_path
 
 build_experiment = experiment:flat
     makefile = makefile
@@ -49,7 +49,7 @@ train_model = command:train_model
     train = train
     model = model
     save_model_path = save_model_path
-    restore_model_path = restore_model_path
+    restore_model_path = "../../oasisnumber/experiment_0/model"
 
 predict = command:predict
     ids = ids
