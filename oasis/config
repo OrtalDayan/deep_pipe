@@ -1,9 +1,9 @@
-@extends(
-    "../config_examples/assets/core/core.config",
-    "../config_examples/assets/batch_iter/3d_patch.config",
-    "../config_examples/assets/model/deepmedic_els.config",
-    "../config_examples/assets/training/deepmedic_brats.config",
-    "../config_examples/assets/problem/segm.config",
+@from "../config_examples/assets" extends(
+    "core/core.config",
+    "batch_iter/3d_patch.config",
+    "model/deepmedic_els.config",
+    "training/deepmedic_brats.config",
+    "problem/segm.config",
 )
 
 
