@@ -1,3 +1,11 @@
+@from "/nmnt/media/home/gleb/deep_pipe/config_examples/assets" extends(
+    "core/core.config",
+    "batch_iter/3d_patch.config",
+    "model/deepmedic_els.config",
+    "training/deepmedic_brats.config",
+    "problem/segm.config",
+)
+
 n_epochs = 10
 
 batch_size = 15
