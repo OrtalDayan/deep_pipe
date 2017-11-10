@@ -20,9 +20,10 @@ dataset = dataset_wrapper:cached
         dataset = dataset:oasis
             data_path = data_path
 
-split = split:cv_111
-    n_splits = 5
-    val_size = 5
+split = split:monte_carlo
+    train_fraction = 0.8
+    val_fraction = 0.1
+    n_splits = 2
     dataset = dataset
 
 lr_dec_mul = 0.5
