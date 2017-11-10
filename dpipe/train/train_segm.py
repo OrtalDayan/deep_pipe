@@ -33,6 +33,7 @@ def train_segm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_p
     lr = find_next_lr(math.inf)
     with train_batch_iter_factory, logger:
         for i in range(n_epochs):
+            print("glebgleb epoch = {}, lr = {}".format(i, lr))  # TODO[gleb] debugging print - remove me.
             with next(train_batch_iter_factory) as train_batch_iter:
                 train_losses = []
                 for inputs in train_batch_iter:
