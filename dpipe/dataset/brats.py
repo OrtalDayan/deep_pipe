@@ -7,11 +7,11 @@ from .from_csv import FromCSVInt
 # We need this class because in the original data segm values are [0, 1, 2, 4]
 @register('brats2017')
 class Brats2017(FromCSVInt):
-    def __init__(self, data_path, metadata_rpath='metadata.csv'):
+    def __init__(self, data_path, metadata_rpath='metadata.csv', modalities=('t1', 't1ce', 't2', 'flair')):
         super().__init__(
             data_path=data_path,
             metadata_rpath=metadata_rpath,
-            modalities=['t1', 't1ce', 't2', 'flair'],
+            modalities=list(modalities),
             target='segm',
             segm2msegm_matrix=np.array([
                 [0, 0, 0],
