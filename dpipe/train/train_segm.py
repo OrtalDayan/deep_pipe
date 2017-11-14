@@ -33,12 +33,16 @@ def train_segm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_p
     lr = find_next_lr(math.inf)
     with train_batch_iter_factory, logger:
         for i in range(n_epochs):
+            print("glebgleb_epoch = {}".format(i))
             with next(train_batch_iter_factory) as train_batch_iter:
                 train_losses = []
                 for inputs in train_batch_iter:
                     train_losses.append(model.do_train_step(*inputs, lr=lr))
                     train_log_write(train_losses[-1])
                 train_avg_log_write(np.mean(train_losses))
+                print("glebgleb_train")
+                print("train_losses mean = {}, len = {}".format(np.mean(train_losses), len(train_losses)))
+                print("train_losses = {}".format(train_losses))
 
             msegms_pred = []
             val_losses = []
@@ -46,6 +50,9 @@ def train_segm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_p
                 y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
                 msegms_pred.append(dataset.segm2msegm(np.argmax(y_pred, axis=0)))
                 val_losses.append(loss)
+            print("glebgleb_val")
+            print("val_losses mean = {}, len = {}".format(np.mean(val_losses), len(val_losses)))
+            print("val_losses = {}".format(val_losses))
 
             val_loss = np.mean(val_losses)
             val_avg_log_write(val_loss)
