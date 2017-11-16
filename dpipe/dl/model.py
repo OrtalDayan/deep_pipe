@@ -10,6 +10,13 @@ def get_model_path(path):
     return os.path.join(path, 'model')
 
 
+def get_variables_to_restore(parent_scope, scopes_to_restore):
+    variables = []
+    for scope in scopes_to_restore:
+        variables += tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="{}/{}".format(parent_scope, scope))
+    return variables
+
+
 @register('model', 'model')
 class Model:
     def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable):
@@ -31,7 +38,9 @@ class Model:
 
         init_op = tf.global_variables_initializer()
         self.saver = tf.train.Saver()
-        self.transfer_saver = tf.train.Saver('deep_medic/to_restore')
+        self.transfer_saver = tf.train.Saver(
+            get_variables_to_restore('deep_medic', ['detailed', 'context', 'upsample', 'comm_1', 'comm_2'])
+        )
         self.graph.finalize()
 
         # ----------------------------------------------------------------------
