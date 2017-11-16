@@ -17,9 +17,9 @@ import time
 class SampleStatsLogger:
     def __init__(self, sample_name, ids, logger, dataset, validate_fn):
         self.ids = ids
-        # self.mscans = [dataset.load_mscan(p) for p in ids]
-        # self.segms = [dataset.load_segm(p) for p in ids]
-        # self.msegms = [dataset.load_msegm(p) for p in ids]
+        self.mscans = [dataset.load_mscan(p) for p in ids]
+        self.segms = [dataset.load_segm(p) for p in ids]
+        self.msegms = [dataset.load_msegm(p) for p in ids]
         self.avg_log_write = logger.make_log_scalar('avg_{}_loss_gleb'.format(sample_name))
         self.dices_log_write = make_log_vector(logger, '{}_dices_gleb'.format(sample_name))
         self.dataset = dataset
@@ -28,8 +28,7 @@ class SampleStatsLogger:
     def make_record(self):
         losses = []
         dices = []
-        for id in self.ids:
-            mscan, segm, msegm = self.dataset.load_mscan(id), self.dataset.load_segm(id), self.dataset.load_msegm(id)
+        for mscan, segm, msegm in zip(self.mscans, self.segms, self.msegms):
             y_pred, loss = self.validate_fn(mscan, segm)
             msegm_pred = self.dataset.segm2msegm(np.argmax(np.argmax(y_pred, axis=0)))
             losses.append(loss)
@@ -41,7 +40,6 @@ class SampleStatsLogger:
 @register()
 def train_segm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_predict: BatchPredict, log_path, val_ids,
                dataset, *, n_epochs, lr_init, lr_dec_mul=0.5, patience: int, rtol=0, atol=0, train_ids=None):
-    # TODO[gleb] add some docs about the train_ids
     logger = Logger(log_path)
 
     mscans_val = [dataset.load_mscan(p) for p in val_ids]
