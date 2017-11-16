@@ -30,7 +30,7 @@ class SampleStatsLogger:
         dices = []
         for mscan, segm, msegm in zip(self.mscans, self.segms, self.msegms):
             y_pred, loss = self.validate_fn(mscan, segm)
-            msegm_pred = self.dataset.segm2msegm(np.argmax(np.argmax(y_pred, axis=0)))
+            msegm_pred = self.dataset.segm2msegm(np.argmax(y_pred, axis=0))
             losses.append(loss)
             dices.append(multichannel_dice_score(msegm_pred, msegm))
         print("glebgleb: in a sample stats logger. Making a record.")
