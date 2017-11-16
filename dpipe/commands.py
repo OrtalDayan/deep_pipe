@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from dpipe.batch_predict import BatchPredict
 from dpipe.config import register
-from dpipe.dl.model import FrozenModel
+from dpipe.dl.model import FrozenModel, Model
 from dpipe.medim.metrics import dice_score as dice
 from dpipe.medim.metrics import multichannel_dice_score
 
@@ -77,3 +77,27 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
     optimal_thresholds = thresholds[np.mean(dices, axis=0).argmax(axis=1)]
     with open(thresholds_path, 'w') as file:
         json.dump(optimal_thresholds.tolist(), file)
+
+
+@register_cmd
+def validate_and_compute_metrics_light(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict,
+                                       print_mean=True):
+    losses = {}
+    dices = {}
+
+    for id in tqdm(ids):
+        mscan, segm, msegm = dataset.load_mscan(id), dataset.load_segm(id), dataset.load_msegm(id)
+        segm_pred, loss = batch_predict.validate(mscan, segm, validate_fn=model.do_val_step)
+        msegm_pred = dataset.segm2msegm(np.argmax(segm_pred, axis=0))
+        losses[id] = loss
+        dices[id] = multichannel_dice_score(msegm_pred, msegm)
+
+    with open(dices_path, 'w') as f:
+        json.dump(dices, f, indent=0)
+
+    with open(losses_path, 'w') as f:
+        json.dump(losses, f, indent=0)
+
+    if print_mean:
+        print("mean value in {}:{}".format(dices_path, np.mean(dices.values(), axis=0)))
+        print("mean value in {}:{}".format(losses_path, np.mean(losses.values())))
