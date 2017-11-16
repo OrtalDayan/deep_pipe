@@ -164,3 +164,17 @@ def merge_datasets(datasets: List[Dataset]) -> Dataset:
             return patient_id2dataset[patient_id].load_msegm(patient_id)
 
     return MergedDataset(datasets[0])
+
+
+@register()
+def weighted(dataset: Dataset, thickness: str) -> Dataset:
+    n = len(dataset.patient_ids)
+    class WeightedBoundariesDataset(Proxy):
+        @functools.lru_cache(n)
+        def load_weighted_mask(self, patient_id) -> np.array:
+            paths = self.df[thickness].loc[patient_id]
+            image = self._load_by_paths(paths)
+
+            return image
+
+    return WeightedBoundariesDataset(dataset)
