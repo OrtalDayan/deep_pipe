@@ -31,6 +31,7 @@ class Model:
 
         init_op = tf.global_variables_initializer()
         self.saver = tf.train.Saver()
+        self.transfer_saver = tf.train.Saver('deep_medic/to_restore')
         self.graph.finalize()
 
         # ----------------------------------------------------------------------
@@ -60,6 +61,9 @@ class Model:
 
     def load(self, path):
         self.saver.restore(self.session, get_model_path(path))
+
+    def transfer_load(self, path):
+        self.transfer_saver.restore(self.session, get_model_path(path))
 
 
 @register('frozen_model', 'model')

@@ -38,13 +38,14 @@ downsampling_ops = {
 def build_model(t_det_in, t_con_in, kernel_size, n_classes, training, name, *,
                 path_blocks=(30, 40, 40, 50), n_chans_com=150, dropout):
     with tf.variable_scope(name):
-        t_det = build_path(t_det_in, path_blocks, kernel_size, training, 'detailed')
-        t_con = build_path(t_con_in, path_blocks, kernel_size, training, 'context')
-        t_con = nearest_neighbour(t_con, 3, data_format='channels_first', name='upsample')
+        with tf.variable_scope("to_restore"):
+            t_det = build_path(t_det_in, path_blocks, kernel_size, training, 'detailed')
+            t_con = build_path(t_con_in, path_blocks, kernel_size, training, 'context')
+            t_con = nearest_neighbour(t_con, 3, data_format='channels_first', name='upsample')
 
-        t_com = tf.concat([t_con, t_det], axis=1)
-        t_com = cba(dropout(t_com), n_chans_com, 1, training, name='comm_1')
-        t_com = cba(dropout(t_com), n_chans_com, 1, training, name='comm_2')
+            t_com = tf.concat([t_con, t_det], axis=1)
+            t_com = cba(dropout(t_com), n_chans_com, 1, training, name='comm_1')
+            t_com = cba(dropout(t_com), n_chans_com, 1, training, name='comm_2')
         return cb(t_com, n_classes, 1, training, 'C')
 
 
