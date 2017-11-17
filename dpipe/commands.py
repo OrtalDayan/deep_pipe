@@ -81,7 +81,7 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
 
 @register_cmd
 def validate_and_compute_metrics_light(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict,
-                                       print_mean=True):
+                                       print_aggr_stats=True):
     losses = {}
     dices = {}
 
@@ -98,6 +98,9 @@ def validate_and_compute_metrics_light(ids, dataset, dices_path, losses_path, mo
     with open(losses_path, 'w') as f:
         json.dump(losses, f, indent=0)
 
-    if print_mean:
-        print("mean value in {}:{}".format(dices_path, np.mean(dices.values(), axis=0)))
-        print("mean value in {}:{}".format(losses_path, np.mean(losses.values())))
+    if print_aggr_stats:
+        dices_mean, dices_std = np.mean(dices.values(), axis=0), np.std(dices.values(), axis=0)
+        losses_mean, losses_std = np.mean(losses.values()), np.std(losses.values())
+        print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))
+        print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
+
