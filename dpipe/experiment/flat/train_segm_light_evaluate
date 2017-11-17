@@ -32,7 +32,7 @@ rule validate_and_compute_metrics_light:
         SAVED_MODEL,
         ids = '{sample}_ids.json'
     output:
-        dices = '{sample}_dices.json'
+        dices = '{sample}_dices.json',
         losses = '{sample}_losses.json'
     shell:
         'python {DO} validate_and_compute_metrics_light {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses}'
