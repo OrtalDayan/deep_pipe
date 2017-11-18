@@ -1,0 +1,42 @@
+from dpipe.config import get_paths
+
+
+DO = get_paths()['do']
+
+CONFIG_ARG = '--config_path ../config'
+SAVED_MODEL = 'model'
+TF_LOG = 'train_logs'
+
+TRAIN_IDS = 'train_ids.json'
+VAL_IDS = 'val_ids.json'
+TEST_IDS = 'test_ids.json'
+
+TEST_DICES = 'test_dices.json'
+VAL_DICES = 'val_dices.json'
+TRAIN_DICES = 'train_dices.json'
+
+TEST_LOSSES = 'test_losses.json'
+VAL_LOSSES = 'val_losses.json'
+TRAIN_LOSSES = 'train_losses.json'
+
+rule all:
+    input:
+        SAVED_MODEL, TEST_DICES, VAL_DICES, TRAIN_DICES
+
+rule train_model:
+    input:
+        TRAIN_IDS, VAL_IDS
+    output:
+        SAVED_MODEL, TF_LOG
+    shell:
+        'python {DO} train_model {CONFIG_ARG} --train_ids_path {TRAIN_IDS} --val_ids_path {VAL_IDS} --log_path {TF_LOG} --save_model_path {SAVED_MODEL} --restore_model_path ""'
+
+rule gleb_metrics_msegm:
+    input:
+        SAVED_MODEL,
+        ids = '{sample}_ids.json'
+    output:
+        dices = '{sample}_dices.json',
+        losses = '{sample}_losses.json'
+    shell:
+        'python {DO} gleb_metrics_msegm {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses} --restore_model_path {SAVED_MODEL}'
