@@ -15,8 +15,12 @@ register_cmd = register(module_type='command')
 
 @register_cmd
 def train_model(train, model, save_model_path, restore_model_path=None):
+    print("in train_model")
     if restore_model_path:
+        print("restoring the model, path = {}".format(restore_model_path))
         model.load(restore_model_path)
+    else:
+        print("haven't restored the model")
 
     train()
     model.save(save_model_path)
