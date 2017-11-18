@@ -87,6 +87,10 @@ def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batc
     for id in tqdm(ids):
         x, y = dataset.load_mscan(id), dataset.load_msegm(id)
         y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
+        print("glebgleb debug printing")
+        print(type(y_pred))
+        print(type(loss))
+        print(loss)
         # [gleb] this is a hardcoded threshold. Results might be significantly if threshold is optimally computed. Maybe
         # fix it on the next iteration.
         y_pred = y_pred > 0.5
