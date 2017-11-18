@@ -45,6 +45,7 @@ class Model:
                                                     [*x_phs, training_ph])
 
         if restore_model_path:
+            print("glebgleb2 in model.py restoring the model")
             self.saver.restore(self.session, get_model_path(restore_model_path))
         self.session.run(init_op)
 
