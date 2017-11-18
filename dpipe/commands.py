@@ -102,7 +102,7 @@ def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batc
     if print_stats:
         dices_values = list(dices.values())
         dices_mean, dices_std = np.mean(dices_values, axis=0), np.std(dices_values, axis=0)
-        losses_values = list(dices.values())
+        losses_values = list(losses.values())
         losses_mean, losses_std = np.mean(losses_values, axis=0), np.std(losses_values, axis=0)
         print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))
         print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
