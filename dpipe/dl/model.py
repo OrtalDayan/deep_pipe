@@ -46,7 +46,6 @@ class Model:
 
         self.session.run(init_op)
         if restore_model_path:
-            print("glebgleb2 in model.py restoring the model {}".format(restore_model_path))
             self.saver.restore(self.session, get_model_path(restore_model_path))
 
     def do_train_step(self, *train_inputs, lr):
