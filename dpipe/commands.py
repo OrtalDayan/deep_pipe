@@ -100,8 +100,10 @@ def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batc
         json.dump(losses, f, indent=0)
 
     if print_stats:
-        dices_mean, dices_std = np.mean(dices.values(), axis=0), np.std(dices.values(), axis=0)
-        losses_mean, losses_std = np.mean(losses.values()), np.std(losses.values())
+        dices_values = list(dices.values())
+        dices_mean, dices_std = np.mean(dices_values, axis=0), np.std(dices_values, axis=0)
+        losses_values = list(dices.values())
+        losses_mean, losses_std = np.mean(losses_values, axis=0), np.std(losses_values, axis=0)
         print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))
         print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
 
