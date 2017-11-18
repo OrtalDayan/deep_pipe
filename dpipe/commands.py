@@ -83,35 +83,69 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
         json.dump(optimal_thresholds.tolist(), file)
 
 
+
 @register_cmd
-def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
-    losses = {}
+def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, frozen_model: FrozenModel, batch_predict: BatchPredict, print_stats):
+    # losses = {}
     dices = {}
 
     for id in tqdm(ids):
         x, y = dataset.load_mscan(id), dataset.load_msegm(id)
-        y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
+        y_pred = batch_predict.predict(x, predict_fn=frozen_model.do_inf_step)
         print("glebgleb debug printing")
-        print(type(y_pred))
-        print(type(loss))
-        print(loss)
+        # print(type(y_pred))
+        # print(type(loss))
+        # print(loss)
         # [gleb] this is a hardcoded threshold. Results might be significantly if threshold is optimally computed. Maybe
         # fix it on the next iteration.
         y_pred = y_pred > 0.5
-        losses[id] = loss
+        # losses[id] = loss
         dices[id] = multichannel_dice_score(y_pred, y)
 
     with open(dices_path, 'w') as f:
         json.dump(dices, f, indent=0)
 
-    with open(losses_path, 'w') as f:
-        json.dump(losses, f, indent=0)
+    # with open(losses_path, 'w') as f:
+    #     json.dump(losses, f, indent=0)
 
     if print_stats:
         dices_values = list(dices.values())
         dices_mean, dices_std = np.mean(dices_values, axis=0), np.std(dices_values, axis=0)
-        losses_values = list(losses.values())
-        losses_mean, losses_std = np.mean(losses_values, axis=0), np.std(losses_values, axis=0)
+        # losses_values = list(losses.values())
+        # losses_mean, losses_std = np.mean(losses_values, axis=0), np.std(losses_values, axis=0)
         print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))
-        print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
+        # print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
 
+
+# @register_cmd
+# def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
+#     losses = {}
+#     dices = {}
+#
+#     for id in tqdm(ids):
+#         x, y = dataset.load_mscan(id), dataset.load_msegm(id)
+#         y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
+#         print("glebgleb debug printing")
+#         print(type(y_pred))
+#         print(type(loss))
+#         print(loss)
+#         # [gleb] this is a hardcoded threshold. Results might be significantly if threshold is optimally computed. Maybe
+#         # fix it on the next iteration.
+#         y_pred = y_pred > 0.5
+#         losses[id] = loss
+#         dices[id] = multichannel_dice_score(y_pred, y)
+#
+#     with open(dices_path, 'w') as f:
+#         json.dump(dices, f, indent=0)
+#
+#     with open(losses_path, 'w') as f:
+#         json.dump(losses, f, indent=0)
+#
+#     if print_stats:
+#         dices_values = list(dices.values())
+#         dices_mean, dices_std = np.mean(dices_values, axis=0), np.std(dices_values, axis=0)
+#         losses_values = list(losses.values())
+#         losses_mean, losses_std = np.mean(losses_values, axis=0), np.std(losses_values, axis=0)
+#         print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))
+#         print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
+#
