@@ -12,16 +12,16 @@ VAL_IDS = 'val_ids.json'
 TEST_IDS = 'test_ids.json'
 
 TEST_DICES = 'test_dices.json'
-//VAL_DICES = 'val_dices.json'
-//TRAIN_DICES = 'train_dices.json'
+# VAL_DICES = 'val_dices.json'
+# TRAIN_DICES = 'train_dices.json'
 
 TEST_LOSSES = 'test_losses.json'
-//VAL_LOSSES = 'val_losses.json'
-//TRAIN_LOSSES = 'train_losses.json'
+# VAL_LOSSES = 'val_losses.json'
+# TRAIN_LOSSES = 'train_losses.json'
 
 rule all:
     input:
-        SAVED_MODEL, TEST_DICES //, VAL_DICES, TRAIN_DICES
+        SAVED_MODEL, TEST_DICES # , VAL_DICES, TRAIN_DICES
 
 rule train_model:
     input:
