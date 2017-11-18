@@ -39,4 +39,4 @@ rule gleb_metrics_msegm:
         dices = '{sample}_dices.json',
         losses = '{sample}_losses.json'
     shell:
-        'python {DO} gleb_metrics_msegm {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses}'
+        'python {DO} gleb_metrics_msegm {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses} --restore_model_path {SAVED_MODEL}'
