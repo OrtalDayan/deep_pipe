@@ -80,17 +80,18 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
 
 
 @register_cmd
-def validate_and_compute_metrics_light(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict,
-                                       print_aggr_stats=True):
+def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
     losses = {}
     dices = {}
 
     for id in tqdm(ids):
-        mscan, segm, msegm = dataset.load_mscan(id), dataset.load_segm(id), dataset.load_msegm(id)
-        segm_pred, loss = batch_predict.validate(mscan, segm, validate_fn=model.do_val_step)
-        msegm_pred = dataset.segm2msegm(np.argmax(segm_pred, axis=0))
+        x, y = dataset.load_mscan(id), dataset.load_msegm(id)
+        y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
+        # [gleb] this is a hardcoded threshold. Results might be significantly if threshold is optimally computed. Maybe
+        # fix it on the next iteration.
+        y_pred = y_pred > 0.5
         losses[id] = loss
-        dices[id] = multichannel_dice_score(msegm_pred, msegm)
+        dices[id] = multichannel_dice_score(y_pred, y)
 
     with open(dices_path, 'w') as f:
         json.dump(dices, f, indent=0)
@@ -98,7 +99,7 @@ def validate_and_compute_metrics_light(ids, dataset, dices_path, losses_path, mo
     with open(losses_path, 'w') as f:
         json.dump(losses, f, indent=0)
 
-    if print_aggr_stats:
+    if print_stats:
         dices_mean, dices_std = np.mean(dices.values(), axis=0), np.std(dices.values(), axis=0)
         losses_mean, losses_std = np.mean(losses.values()), np.std(losses.values())
         print("{}: mean = {}, std = {}".format(dices_path, dices_mean, dices_std))

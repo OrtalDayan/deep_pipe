@@ -25,9 +25,9 @@ rule train_model:
     output:
         SAVED_MODEL, TF_LOG
     shell:
-        'python {DO} train_model {CONFIG_ARG} --train_ids_path {TRAIN_IDS} --val_ids_path {VAL_IDS} --log_path {TF_LOG} --save_model_path {SAVED_MODEL}'
+        'python {DO} train_model {CONFIG_ARG} --train_ids_path {TRAIN_IDS} --val_ids_path {VAL_IDS} --log_path {TF_LOG} --save_model_path {SAVED_MODEL} --restore_model_path ""'
 
-rule validate_and_compute_metrics_light:
+rule gleb_metrics_msegm:
     input:
         SAVED_MODEL,
         ids = '{sample}_ids.json'
@@ -35,4 +35,4 @@ rule validate_and_compute_metrics_light:
         dices = '{sample}_dices.json',
         losses = '{sample}_losses.json'
     shell:
-        'python {DO} validate_and_compute_metrics_light {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses}'
+        'python {DO} gleb_metrics_msegm {CONFIG_ARG} --ids_path {input.ids} --dices_path {output.dices} --losses_path {output.losses}'
