@@ -44,10 +44,10 @@ class Model:
         self.call_pred = self.session.make_callable(y_pred,
                                                     [*x_phs, training_ph])
 
+        self.session.run(init_op)
         if restore_model_path:
             print("glebgleb2 in model.py restoring the model {}".format(restore_model_path))
             self.saver.restore(self.session, get_model_path(restore_model_path))
-        self.session.run(init_op)
 
     def do_train_step(self, *train_inputs, lr):
         _, loss = self.call_train(*train_inputs, lr, True)

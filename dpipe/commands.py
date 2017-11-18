@@ -85,13 +85,13 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
 
 
 @register_cmd
-def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, frozen_model: FrozenModel, batch_predict: BatchPredict, print_stats):
+def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
     # losses = {}
     dices = {}
 
     for id in tqdm(ids):
         x, y = dataset.load_mscan(id), dataset.load_msegm(id)
-        y_pred = batch_predict.predict(x, predict_fn=frozen_model.do_inf_step)
+        y_pred = batch_predict.predict(x, predict_fn=model.do_inf_step)
         print("glebgleb debug printing")
         # print(type(y_pred))
         # print(type(loss))
