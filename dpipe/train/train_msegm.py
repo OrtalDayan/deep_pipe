@@ -11,7 +11,7 @@ from dpipe.dl.model import Model
 from dpipe.medim.metrics import multichannel_dice_score
 from .logging import make_log_vector
 from .utils import make_find_next_lr, make_check_loss_decrease
-
+from tqdm import tqdm
 
 @register()
 def train_msegm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_predict: BatchPredict, log_path,
@@ -31,7 +31,7 @@ def train_msegm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_
 
     lr = find_next_lr(math.inf)
     with train_batch_iter_factory, logger:
-        for i in range(n_epochs):
+        for _ in tqdm(range(n_epochs)):
             with next(train_batch_iter_factory) as train_batch_iter:
                 train_losses = []
                 for inputs in train_batch_iter:
