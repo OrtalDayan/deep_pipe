@@ -147,6 +147,6 @@ def group_cv_111_pure_011(dataset: DataSet, *, val_size, n_splits):
 
 
 @register()
-def group_cv_111_pure_011_truncated(dataset: Dataset, *, val_size, n_splits, experiments_num):
+def group_cv_111_pure_011_truncated(dataset: DataSet, *, val_size, n_splits, experiments_num):
     splits = group_cv_111_pure_011(dataset=dataset, val_size=val_size, n_splits=n_splits)
     return splits[:experiments_num]
