@@ -14,8 +14,8 @@ data_path = "/nmnt/x04-hdd/oasis_brain/"
 
 dataset = dataset_wrapper:cached
     dataset = dataset_wrapper:normalized
-        mean = true
-        std = true
+        mean = True
+        std = True
         dataset = dataset:oasis
             data_path = data_path
 
