@@ -4,7 +4,6 @@ import tensorflow.contrib.slim as slim
 from dpipe.config import register
 
 
-@register('optimize', 'tf')
 def optimize(loss, lr, *, tf_optimizer_name, **params):
     with tf.variable_scope('optimization'):
         optimizer = getattr(tf.train, tf_optimizer_name)(lr, name='optimizer', **params)
