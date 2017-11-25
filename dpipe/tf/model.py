@@ -16,9 +16,11 @@ def get_variables_to_restore(parent_scope, scopes_to_restore):
         variables += tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope="{}/{}".format(parent_scope, scope))
     return variables
 
+
 @register('tf', 'model')
 class TFModel(Model):
-    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable):
+    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable,
+                 restore_model_path=None):
         self.model_core = model_core
 
         self._build(logits2pred, logits2loss, optimize, restore_model_path)

@@ -45,6 +45,12 @@ def cv_111(dataset: DataSet, *, val_size, n_splits):
     return train_val_test_ids
 
 
+@register()
+def cv_111_truncated(dataset: DataSet, *, val_size, n_splits, experiments_num):
+    splits = cv_111(dataset=dataset, val_size=val_size, n_splits=n_splits)
+    return splits[:experiments_num]
+
+
 def group_train_test_split(x, groups, *, train_size=None, test_size=None,
                            random_state=None, shuffle=True):
     train_groups, test_groups = train_test_split(

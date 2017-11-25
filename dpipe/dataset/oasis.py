@@ -20,8 +20,8 @@ class Oasis(FromCSVInt):
         img.resize(img.shape[:-1])
         return img
 
-    def load_mscan(self, patient_id):
-        mscan = super().load_mscan(patient_id)
+    def load_image(self, patient_id):
+        mscan = super().load_image(patient_id)
         assert(len(mscan) == 1)
         scan = mscan[0]
         scan.resize(scan.shape[:-1])

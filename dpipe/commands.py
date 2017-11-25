@@ -1,4 +1,3 @@
-import os
 import json
 import os
 
@@ -10,7 +9,7 @@ from dpipe.config import register
 from dpipe.medim.metrics import dice_score as dice
 from dpipe.medim.metrics import multichannel_dice_score
 from dpipe.medim.utils import load_by_ids
-from dpipe.model import FrozenModel
+from dpipe.model import FrozenModel, Model
 from dpipe.train.validator import evaluate
 
 
