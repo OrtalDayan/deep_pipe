@@ -1,8 +1,6 @@
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
-from dpipe.config import register
-
 
 def optimize(loss, lr, *, tf_optimizer_name, **params):
     with tf.variable_scope('optimization'):
@@ -10,18 +8,15 @@ def optimize(loss, lr, *, tf_optimizer_name, **params):
         return slim.learning.create_train_op(loss, optimizer)
 
 
-@register(module_type='tf')
 def softmax(logits):
     with tf.variable_scope('softmax'):
         return tf.nn.softmax(logits=logits, dim=1)
 
 
-@register(module_type='tf')
 def sigmoid(logits):
     return tf.nn.sigmoid(logits, name='sigmoid')
 
 
-@register(module_type='tf')
 def softmax_cross_entropy(*, logits):
     with tf.variable_scope('softmax_cross_entropy'):
         y_ph_shape = logits.shape[0:1].concatenate(logits.shape[2:])
@@ -32,13 +27,11 @@ def softmax_cross_entropy(*, logits):
     return loss, y_ph
 
 
-@register(module_type='tf')
 def sigmoid_cross_entropy(*, logits):
     y_ph = tf.placeholder(tf.float32, logits.shape, name='y_true')
     return tf.losses.sigmoid_cross_entropy(y_ph, logits=logits), y_ph
 
 
-@register(module_type='tf')
 def soft_dice_loss(*, logits, y_ph, softness=1e-7):
     batch = tf.shape(y_ph)[0]
 

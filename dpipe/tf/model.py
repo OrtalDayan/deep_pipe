@@ -1,14 +1,6 @@
-import os
-
 import tensorflow as tf
-
-from dpipe.config import register
 from dpipe.model import Model, FrozenModel, get_model_path
 from dpipe.model_core import ModelCore
-
-def get_model_path(path):
-    return os.path.join(path, 'model')
-
 
 def get_variables_to_restore(parent_scope, scopes_to_restore):
     variables = []
@@ -17,7 +9,6 @@ def get_variables_to_restore(parent_scope, scopes_to_restore):
     return variables
 
 
-@register('tf', 'model')
 class TFModel(Model):
     def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable,
                  restore_model_path=None):
@@ -78,7 +69,6 @@ class TFModel(Model):
         self.transfer_saver.restore(self.session, get_model_path(path))
 
 
-@register('tf', 'frozen_model')
 class TFFrozenModel(FrozenModel):
     def __init__(self, model_core: ModelCore, logits2pred: callable, restore_model_path):
         self.model_core = model_core

@@ -5,7 +5,6 @@ import numpy as np
 from tqdm import tqdm
 
 from dpipe.batch_predict import BatchPredict
-from dpipe.config import register
 from dpipe.medim.metrics import dice_score as dice
 from dpipe.medim.metrics import multichannel_dice_score
 from dpipe.medim.utils import load_by_ids
@@ -13,10 +12,7 @@ from dpipe.model import FrozenModel, Model
 from dpipe.train.validator import evaluate
 
 
-register_cmd = register(module_type='command')
 
-
-@register_cmd
 def train_model(train, model, save_model_path, restore_model_path=None, transfer_model_path=None):
     if transfer_model_path:
         model.transfer_load(transfer_model_path)
@@ -27,7 +23,6 @@ def train_model(train, model, save_model_path, restore_model_path=None, transfer
     model.save(save_model_path)
 
 
-@register_cmd
 def transform(input_path, output_path, transform_fn):
     os.makedirs(output_path)
 
@@ -35,7 +30,6 @@ def transform(input_path, output_path, transform_fn):
         np.save(os.path.join(output_path, f), transform_fn(np.load(os.path.join(input_path, f))))
 
 
-@register_cmd
 def predict(ids, output_path, load_x, frozen_model: FrozenModel, batch_predict: BatchPredict):
     os.makedirs(output_path)
 
@@ -48,7 +42,6 @@ def predict(ids, output_path, load_x, frozen_model: FrozenModel, batch_predict: 
         del x, y
 
 
-@register('evaluate', 'command')
 def evaluate_cmd(load_y, input_path, output_path, ids, single=None, multiple=None):
     os.makedirs(output_path)
 
@@ -70,7 +63,6 @@ def evaluate_cmd(load_y, input_path, output_path, ids, single=None, multiple=Non
         save(name, value)
 
 
-@register_cmd
 def compute_dices(load_msegm, predictions_path, dices_path):
     dices = {}
     for f in tqdm(os.listdir(predictions_path)):
@@ -84,7 +76,6 @@ def compute_dices(load_msegm, predictions_path, dices_path):
         json.dump(dices, f, indent=0)
 
 
-@register_cmd
 def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
     """
     Find thresholds for the predicted probabilities that maximize the mean dice score.

@@ -14,7 +14,6 @@ from .utils import make_find_next_lr, make_check_loss_decrease
 from tqdm import tqdm
 
 
-@register()
 def train_segm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_predict: BatchPredict, log_path, val_ids,
                dataset, *, n_epochs, lr_init, lr_dec_mul=0.5, patience: int, rtol=0, atol=0):
     logger = Logger(log_path)
