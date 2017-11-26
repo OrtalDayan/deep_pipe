@@ -54,7 +54,7 @@ def apply_mask(dataset: DataSet, mask_modality_id: int = None,
             return np.array(images)
 
         @property
-        def n_chans_mscan(self):
+        def n_chans_image(self):
             return self._shadowed.n_chans_image - 1
 
     return dataset if mask_modality_id is None else MaskedDataset(dataset)
@@ -63,7 +63,7 @@ def apply_mask(dataset: DataSet, mask_modality_id: int = None,
 def bbox_extraction(dataset: DataSet) -> DataSet:
     # Use this small cache to speed up data loading. Usually users load
     # all scans for the same person at the same time
-    load_x = functools.lru_cache(3)(dataset.load_x)
+    load_x = functools.lru_cache(3)(dataset.load_image)
 
     class BBoxedDataset(Proxy):
         def load_x(self, patient_id):
@@ -136,7 +136,7 @@ def merge_datasets(datasets: List[DataSet]) -> DataSet:
     [np.testing.assert_array_equal(a.segm2msegm_matrix, b.segm2msegm_matrix)
      for a, b, in zip(datasets, datasets[1:])]
 
-    assert all(dataset.n_chans_mscan == datasets[0].n_chans_mscan
+    assert all(dataset.n_chans_image == datasets[0].n_chans_image
                for dataset in datasets)
 
     patient_id2dataset = ChainMap(*({pi: dataset for pi in dataset.ids}

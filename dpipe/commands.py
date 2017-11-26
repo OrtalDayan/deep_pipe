@@ -12,7 +12,6 @@ from dpipe.model import FrozenModel, Model
 from dpipe.train.validator import evaluate
 
 
-
 def train_model(train, model, save_model_path, restore_model_path=None, transfer_model_path=None):
     if transfer_model_path:
         model.transfer_load(transfer_model_path)
@@ -137,12 +136,11 @@ def gleb_metrics_helper(ids, dataset, dices_path, losses_path, model: Model, bat
         print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
 
 
-@register_cmd
 def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
     def get_loss_and_dice(id, dataset, batch_predict, model):
-        x, y = dataset.load_mscan(id), dataset.load_msegm(id)
+        x, y = dataset.load_image(id), dataset.load_msegm(id)
         y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
-        # [gleb] this is a hardcoded threshold. Results might be significantly if threshold is optimally computed. Maybe
+        # [gleb] this is a hardcoded threshold. Results might be different if threshold is optimally computed. Maybe
         # fix it on the next iteration.
         y_pred = y_pred > 0.5
         return loss, multichannel_dice_score(y_pred, y)
@@ -150,10 +148,9 @@ def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batc
     gleb_metrics_helper(ids, dataset, dices_path, losses_path, model, batch_predict, print_stats, get_loss_and_dice)
 
 
-@register_cmd
 def gleb_metrics_segm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
     def get_loss_and_dice(id, dataset, batch_predict, model):
-        mscan, segm, msegm = dataset.load_mscan(id), dataset.load_segm(id), dataset.load_msegm(id)
+        mscan, segm, msegm = dataset.load_image(id), dataset.load_segm(id), dataset.load_msegm(id)
         segm_pred, loss = batch_predict.validate(mscan, segm, validate_fn=model.do_val_step)
         msegm_pred = dataset.segm2msegm(np.argmax(segm_pred, axis=0))
         return loss, multichannel_dice_score(msegm_pred, msegm)

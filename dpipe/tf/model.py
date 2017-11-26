@@ -2,6 +2,7 @@ import tensorflow as tf
 from dpipe.model import Model, FrozenModel, get_model_path
 from dpipe.model_core import ModelCore
 
+
 def get_variables_to_restore(parent_scope, scopes_to_restore):
     variables = []
     for scope in scopes_to_restore:
