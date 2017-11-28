@@ -48,7 +48,7 @@ class TFModel(Model):
 
         self.session.run(init_op)
         if restore_model_path:
-            self.saver.restore(self.session, get_model_path(restore_model_path))
+            self.load(restore_model_path)
 
     def do_train_step(self, *train_inputs, lr):
         _, loss = self.call_train(*train_inputs, lr, True)

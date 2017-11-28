@@ -45,8 +45,8 @@ def apply(instance, methods, function):
 def apply_mask(dataset: DataSet, mask_modality_id: int = None,
                mask_value: int = None) -> DataSet:
     class MaskedDataset(Proxy):
-        def load_x(self, patient_id):
-            images = self._shadowed.load_x(patient_id)
+        def load_image(self, patient_id):
+            images = self._shadowed.load_image(patient_id)
             mask = images[mask_modality_id]
             mask_bin = (mask > 0 if mask_value is None else mask == mask_value)
             assert np.sum(mask_bin) > 0, 'The obtained mask is empty'
@@ -63,22 +63,22 @@ def apply_mask(dataset: DataSet, mask_modality_id: int = None,
 def bbox_extraction(dataset: DataSet) -> DataSet:
     # Use this small cache to speed up data loading. Usually users load
     # all scans for the same person at the same time
-    load_x = functools.lru_cache(3)(dataset.load_image)
+    load_image = functools.lru_cache(3)(dataset.load_image)
 
     class BBoxedDataset(Proxy):
-        def load_x(self, patient_id):
-            img = load_x(patient_id)
+        def load_image(self, patient_id):
+            img = load_image(patient_id)
             mask = np.any(img > 0, axis=0)
             return medim.bb.extract([img], mask)[0]
 
         def load_segm(self, patient_id):
             img = self._shadowed.load_segm(patient_id)
-            mask = np.any(load_x(patient_id) > 0, axis=0)
+            mask = np.any(load_image(patient_id) > 0, axis=0)
             return medim.bb.extract([img], mask=mask)[0]
 
         def load_msegm(self, patient_id):
             img = self._shadowed.load_msegm(patient_id)
-            mask = np.any(load_x(patient_id) > 0, axis=0)
+            mask = np.any(load_image(patient_id) > 0, axis=0)
             return medim.bb.extract([img], mask=mask)[0]
 
     return BBoxedDataset(dataset)
@@ -87,8 +87,8 @@ def bbox_extraction(dataset: DataSet) -> DataSet:
 def normalized(dataset: DataSet, mean, std,
                drop_percentile: int = None) -> DataSet:
     class NormalizedDataset(Proxy):
-        def load_x(self, patient_id):
-            img = self._shadowed.load_x(patient_id)
+        def load_image(self, patient_id):
+            img = self._shadowed.load_image(patient_id)
             return medim.prep.normalize_mscan(img, mean=mean, std=std,
                                               drop_percentile=drop_percentile)
 
@@ -97,8 +97,8 @@ def normalized(dataset: DataSet, mean, std,
 
 def normalized_sub(dataset: DataSet) -> DataSet:
     class NormalizedDataset(Proxy):
-        def load_x(self, patient_id):
-            mscan = self._shadowed.load_x(patient_id)
+        def load_image(self, patient_id):
+            mscan = self._shadowed.load_image(patient_id)
             mask = np.any(mscan > 0, axis=0)
             mscan_inner = medim.bb.extract([mscan], mask)[0]
 
@@ -146,11 +146,11 @@ def merge_datasets(datasets: List[DataSet]) -> DataSet:
 
     class MergedDataset(Proxy):
         @property
-        def patient_ids(self):
+        def ids(self):
             return ids
 
-        def load_x(self, patient_id):
-            return patient_id2dataset[patient_id].load_x(patient_id)
+        def load_image(self, patient_id):
+            return patient_id2dataset[patient_id].load_image(patient_id)
 
         def load_segm(self, patient_id):
             return patient_id2dataset[patient_id].load_segm(patient_id)
@@ -181,8 +181,8 @@ class Padded(Proxy):
         self.shape = shape
         self.axes = axes
 
-    def load_x(self, patient_id):
-        img = self._shadowed.load_x(patient_id)
+    def load_image(self, patient_id):
+        img = self._shadowed.load_image(patient_id)
         return medim.preprocessing.pad(img, self.shape, self.axes)
 
     def load_segm(self, patient_id):
