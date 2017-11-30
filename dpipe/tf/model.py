@@ -11,13 +11,12 @@ def get_variables_to_restore(parent_scope, scopes_to_restore):
 
 
 class TFModel(Model):
-    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable,
-                 restore_model_path=None):
+    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable):
         self.model_core = model_core
 
-        self._build(logits2pred, logits2loss, optimize, restore_model_path)
+        self._build(logits2pred, logits2loss, optimize)
 
-    def _build(self, logits2pred, logits2loss, optimize, restore_model_path):
+    def _build(self, logits2pred, logits2loss, optimize):
         self.graph = tf.get_default_graph()
 
         training_ph = tf.placeholder('bool', name='is_training')
@@ -47,8 +46,6 @@ class TFModel(Model):
                                                     [*x_phs, training_ph])
 
         self.session.run(init_op)
-        if restore_model_path:
-            self.load(restore_model_path)
 
     def do_train_step(self, *train_inputs, lr):
         _, loss = self.call_train(*train_inputs, lr, True)

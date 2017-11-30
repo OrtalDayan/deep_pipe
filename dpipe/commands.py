@@ -111,8 +111,9 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
         json.dump(optimal_thresholds.tolist(), file)
 
 
-def gleb_metrics_helper(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats,
-                        get_loss_and_dice):
+def gleb_metrics_helper(ids, dataset, dices_path, losses_path, model: Model, restore_model_path,
+                        batch_predict: BatchPredict, print_stats, get_loss_and_dice):
+    model.load(restore_model_path)
     losses = {}
     dices = {}
 
@@ -136,7 +137,8 @@ def gleb_metrics_helper(ids, dataset, dices_path, losses_path, model: Model, bat
         print("{}: mean = {}, std = {}".format(losses_path, losses_mean, losses_std))
 
 
-def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
+def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, restore_model_path,
+                       batch_predict: BatchPredict, print_stats):
     def get_loss_and_dice(id, dataset, batch_predict, model):
         x, y = dataset.load_image(id), dataset.load_msegm(id)
         y_pred, loss = batch_predict.validate(x, y, validate_fn=model.do_val_step)
@@ -145,14 +147,17 @@ def gleb_metrics_msegm(ids, dataset, dices_path, losses_path, model: Model, batc
         y_pred = y_pred > 0.5
         return loss, multichannel_dice_score(y_pred, y)
 
-    gleb_metrics_helper(ids, dataset, dices_path, losses_path, model, batch_predict, print_stats, get_loss_and_dice)
+    gleb_metrics_helper(ids, dataset, dices_path, losses_path, model, restore_model_path, batch_predict, print_stats,
+                        get_loss_and_dice)
 
 
-def gleb_metrics_segm(ids, dataset, dices_path, losses_path, model: Model, batch_predict: BatchPredict, print_stats):
+def gleb_metrics_segm(ids, dataset, dices_path, losses_path, model: Model, restore_model_path,
+                      batch_predict: BatchPredict, print_stats):
     def get_loss_and_dice(id, dataset, batch_predict, model):
         mscan, segm, msegm = dataset.load_image(id), dataset.load_segm(id), dataset.load_msegm(id)
         segm_pred, loss = batch_predict.validate(mscan, segm, validate_fn=model.do_val_step)
         msegm_pred = dataset.segm2msegm(np.argmax(segm_pred, axis=0))
         return loss, multichannel_dice_score(msegm_pred, msegm)
 
-    gleb_metrics_helper(ids, dataset, dices_path, losses_path, model, batch_predict, print_stats, get_loss_and_dice)
+    gleb_metrics_helper(ids, dataset, dices_path, losses_path, model, restore_model_path, batch_predict, print_stats,
+                        get_loss_and_dice)
