@@ -20,7 +20,7 @@ def train_model(train, model, save_model_path, restore_model_path=None, transfer
 
     if transfer_model_path:
         print("glebgleb beginning surgery")
-        model.do_surgery_transfer(restore_model_path)
+        model.do_surgery_transfer(transfer_model_path)
         print("glebgleb surgery is successful")
 
     train()
