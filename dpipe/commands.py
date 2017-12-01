@@ -10,13 +10,22 @@ from dpipe.medim.metrics import multichannel_dice_score
 from dpipe.medim.utils import load_by_ids
 from dpipe.model import FrozenModel, Model
 from dpipe.train.validator import evaluate
+from dpipe.surgery import surgery
 
 
 def train_model(train, model, save_model_path, restore_model_path=None, transfer_model_path=None):
+    # if transfer_model_path:
+    #     model.transfer_load(transfer_model_path)
+    # if restore_model_path:
+    #     model.load(restore_model_path)
+
     if transfer_model_path:
-        model.transfer_load(transfer_model_path)
-    if restore_model_path:
-        model.load(restore_model_path)
+        helper_model_save_path = "helper_model_save"
+        model.save(helper_model_save_path)
+
+        print("glebgleb beginning surgery")
+        surgery(helper_model_save_path, transfer_model_path)
+        print("glebgleb surgery is successful")
 
     train()
     model.save(save_model_path)
@@ -111,11 +120,23 @@ def find_dice_threshold(load_msegm, ids, predictions_path, thresholds_path):
         json.dump(optimal_thresholds.tolist(), file)
 
 
+def get_non_augm_ids(ids):
+    print("Getting non augm ids only. Total number = {}".format(len(ids)))
+    non_augm_ids = []
+    for patient_id in ids:
+        if "^" not in patient_id:
+            non_augm_ids.append(patient_id)
+    print("The number of non augmented = {}".format(len(non_augm_ids)))
+    return non_augm_ids
+
+
 def gleb_metrics_helper(ids, dataset, dices_path, losses_path, model: Model, restore_model_path,
                         batch_predict: BatchPredict, print_stats, get_loss_and_dice):
     model.load(restore_model_path)
     losses = {}
     dices = {}
+
+    ids = get_non_augm_ids(ids)
 
     for id in tqdm(ids):
         loss, dice = get_loss_and_dice(id, dataset, batch_predict, model)
