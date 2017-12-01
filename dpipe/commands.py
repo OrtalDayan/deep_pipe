@@ -10,7 +10,6 @@ from dpipe.medim.metrics import multichannel_dice_score
 from dpipe.medim.utils import load_by_ids
 from dpipe.model import FrozenModel, Model
 from dpipe.train.validator import evaluate
-from dpipe.surgery import surgery
 
 
 def train_model(train, model, save_model_path, restore_model_path=None, transfer_model_path=None):
@@ -20,11 +19,8 @@ def train_model(train, model, save_model_path, restore_model_path=None, transfer
     #     model.load(restore_model_path)
 
     if transfer_model_path:
-        helper_model_save_path = "helper_model_save"
-        model.save(helper_model_save_path)
-
         print("glebgleb beginning surgery")
-        surgery(helper_model_save_path, transfer_model_path)
+        model.do_surgery_transfer(restore_model_path)
         print("glebgleb surgery is successful")
 
     train()

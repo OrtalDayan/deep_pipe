@@ -1,6 +1,7 @@
 import tensorflow as tf
 from dpipe.model import Model, FrozenModel, get_model_path
 from dpipe.model_core import ModelCore
+from dpipe.surgery import surgery
 
 
 def get_variables_to_restore(parent_scope, scopes_to_restore):
@@ -65,6 +66,9 @@ class TFModel(Model):
 
     def transfer_load(self, path):
         self.transfer_saver.restore(self.session, get_model_path(path))
+
+    def do_surgery_transfer(self, path):
+        surgery(self.session, path)
 
 
 class TFFrozenModel(FrozenModel):
