@@ -36,7 +36,7 @@ def broadcast_nds(tensors):
     return [broadcast_nd(tensor) for tensor in tensors]
 
 
-def get_variables_to_transfer(vars_to_omit):
+def get_variables_to_transfer(vars_to_omit, debug_print=True):
     parent_scope = 'deep_medic'
     scopes_to_transfer = ['detailed', 'context', 'upsample', 'comm_1', 'comm_2']
     variables = []
@@ -76,9 +76,9 @@ def get_name_to_variable_mapping():
     return mapping
 
 
-def surgery(sess, transfer_model):
+def surgery(model_path, sess):
     var_names = ['deep_medic/detailed/cba_0_a/cb/conv3d/kernel:0', 'deep_medic/context/cba_0_a/cb/conv3d/kernel:0']
-    tensor_vals = get_tensor_vals_to_transfer(tensor_names=var_names, transfer_model=transfer_model)
+    tensor_vals = get_tensor_vals_to_transfer(tensor_names=var_names, transfer_model=model_path)
     tensor_vals = broadcast_nds(tensor_vals)
-    main_transfer(sess, var_names, transfer_model)
+    main_transfer(sess, var_names, model_path)
     additional_transfer(sess, var_names, tensor_vals)

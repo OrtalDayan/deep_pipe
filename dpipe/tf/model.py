@@ -12,12 +12,13 @@ def get_variables_to_restore(parent_scope, scopes_to_restore):
 
 
 class TFModel(Model):
-    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable):
+    def __init__(self, model_core: ModelCore, logits2pred: callable, logits2loss: callable, optimize: callable,
+                 surgery_transfer_path = None):
         self.model_core = model_core
 
-        self._build(logits2pred, logits2loss, optimize)
+        self._build(logits2pred, logits2loss, optimize, surgery_transfer_path)
 
-    def _build(self, logits2pred, logits2loss, optimize):
+    def _build(self, logits2pred, logits2loss, optimize, surgery_transfer_path):
         self.graph = tf.get_default_graph()
 
         training_ph = tf.placeholder('bool', name='is_training')
@@ -34,7 +35,8 @@ class TFModel(Model):
         self.transfer_saver = tf.train.Saver(
             get_variables_to_restore('deep_medic', ['detailed', 'context', 'upsample', 'comm_1', 'comm_2'])
         )
-        self.graph.finalize()
+
+        # self.graph.finalize() TODO[gleb] moved finalization lower, because need to
 
         # ----------------------------------------------------------------------
         self.session = tf.Session()
@@ -46,7 +48,14 @@ class TFModel(Model):
         self.call_pred = self.session.make_callable(y_pred,
                                                     [*x_phs, training_ph])
 
-        self.session.run(init_op)
+        self.session.run(init_op)  # TODO[gleb] maybe don't need to run this op
+
+        if surgery_transfer_path:
+            print("glebgleb beginning surgery")
+            surgery(surgery_transfer_path, self.session)
+            print("glebgleb surgery is successful")
+
+        self.graph.finalize()
 
     def do_train_step(self, *train_inputs, lr):
         _, loss = self.call_train(*train_inputs, lr, True)
@@ -66,9 +75,6 @@ class TFModel(Model):
 
     def transfer_load(self, path):
         self.transfer_saver.restore(self.session, get_model_path(path))
-
-    def do_surgery_transfer(self, path):
-        surgery(self.session, path)
 
 
 class TFFrozenModel(FrozenModel):
