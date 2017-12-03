@@ -17,7 +17,7 @@ def train_msegm(model: Model, train_batch_iter_factory: BatchIterFactory, batch_
                 val_ids, dataset, *, n_epochs, lr_init, lr_dec_mul=0.5, patience: int, rtol=0, atol=0):
     logger = Logger(log_path)
 
-    mscans_val = [dataset.load_mscan(p) for p in val_ids]
+    mscans_val = [dataset.load_image(p) for p in val_ids]
     msegms_val = [dataset.load_msegm(p) for p in val_ids]
 
     find_next_lr = make_find_next_lr(lr_init, lambda lr: lr * lr_dec_mul,
