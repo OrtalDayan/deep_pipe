@@ -6,6 +6,7 @@ from dpipe.medim.shape_utils import compute_shape_from_spatial
 from dpipe.medim.utils import pad
 from dpipe.medim.features import get_coordinate_features
 from .patch_3d import Patch3DPredictor, spatial_dims
+from .utils import validate_object, predict_object
 
 
 def pad_spatial_size(x, spatial_size: np.array, spatial_dims):
@@ -94,6 +95,7 @@ class Patch3DFixedDropoutPredictor(Patch3DFixedPredictor):
             temp_loss.append(loss)
 
         y_preds = np.array(temp_y_pred).mean(axis=0)
+        # mean of losses is higer than loss of mean for logloss
         loss = np.array(temp_loss).mean(axis=0)
 
         return self.combine_y(y_preds, x.shape), loss
