@@ -82,6 +82,15 @@ class TorchModel(Model):
         path = get_model_path(path)
         self.model_core.load_state_dict(torch.load(path))
 
+    def transfer_load(self, model_path: str):
+        print("glebgleb transferring weights from {}".format(model_path))
+        state_to_transfer = torch.load(model_path)
+        del state_to_transfer['fc.weight']
+        del state_to_transfer['fc.bias']
+        state = self.model_core.state_dict()
+        state.update(state_to_transfer)
+        self.model_core.load_state_dict(state)
+
 
 class TorchFrozenModel(FrozenModel):
     def __init__(self, model_core: torch.nn.Module, logits2pred: callable, restore_model_path: str, cuda=True):

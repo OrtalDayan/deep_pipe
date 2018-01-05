@@ -17,9 +17,11 @@ from dpipe.model import FrozenModel
 from dpipe.train.validator import evaluate as evaluate_fn
 
 
-def train_model(train, model, save_model_path, restore_model_path=None):
+def train_model(train, model, save_model_path, restore_model_path=None, transfer_model_path=None):
     if restore_model_path:
         model.load(restore_model_path)
+    if transfer_model_path:
+        model.transfer_load(transfer_model_path)
 
     train()
     model.save(save_model_path)
