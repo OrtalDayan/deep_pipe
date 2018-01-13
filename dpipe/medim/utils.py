@@ -49,7 +49,7 @@ def load_image(path: str):
     if path.endswith(('.nii', '.nii.gz', '.hdr', '.img')):
         import nibabel as nib
         return nib.load(path).get_data()
-    if path.endswith('.tif'):
+    if path.endswith(('.tif', '.png', '.JPG')):
         from PIL import Image
         with Image.open(path) as image:
             return np.asarray(image)

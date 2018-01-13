@@ -82,9 +82,10 @@ class TorchModel(Model):
         path = get_model_path(path)
         self.model_core.load_state_dict(torch.load(path))
 
-    def transfer_load(self, model_path: str):
-        print("glebgleb transferring weights from {}".format(model_path))
-        state_to_transfer = torch.load(model_path)
+    def transfer_load(self, path: str):
+        path = get_model_path(path)
+        print("glebgleb transferring weights from {}".format(path))
+        state_to_transfer = torch.load(path)
         del state_to_transfer['fc.weight']
         del state_to_transfer['fc.bias']
         state = self.model_core.state_dict()
